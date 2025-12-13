@@ -1,0 +1,45 @@
+---
+title: "Homework 2, DACSS 690D"
+output:
+  flexdashboard::flex_dashboard:
+    navbar:
+      - { icon: "fa-github", href: "https://github.com/DACSS-Spatial/The-Thematics", align: right }
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard) # always
+```
+
+## Sidebar {.sidebar}
+
+In Somerville, the rate of property crime remains significantly higher than violent crime, but both types of crime compare favorably relative to many U.S. cities. According to NeighborhoodScout, the chance of experiencing a property crime in Somerville is about 1 in 71, whereas the chance of becoming a victim of a violent (person-based) crime is approximately 1 in 408. Meanwhile, broader datasets show violent crime in Somerville at approximately 4.52 incidents per 1,000 residents in a typical year, with property crimes occurring more frequently—around 11.5 incidents per 1,000 in some neighborhoods. While overall crime rates in Somerville are lower than national averages.
+
+I'm mapping crime data around my old apartment in Somerville, MA to see how it compares to the rest of the city. By looking at both property crime and crimes against persons in nearby census blocks, I can get a clearer picture of how safe the area actually was while I lived there.
+
+The Repo that generated this dashboard can be found [here!](https://github.com/meade68/DACSS_690D_Week09_HW2)
+
+## Column {.tabset .tabset-fade}
+
+### Property Crimes per Capita, by Census Block 
+
+```{r}
+readRDS(url("https://github.com/meade68/DACSS_690D_Week09_HW2/raw/refs/heads/main/Block_property.rds"))
+```
+
+### Person Crimes per Capita, by Census Block 
+
+```{r}
+readRDS(url("https://github.com/meade68/DACSS_690D_Week09_HW2/raw/refs/heads/main/Block_person.rds"))
+```
+
+### Property Crimes per Capita, by H3
+
+```{r}
+readRDS(url("https://github.com/meade68/DACSS_690D_Week09_HW2/raw/refs/heads/main/hex_property.rds"))
+```
+
+### Person Crimes per Capita, by H3 
+
+```{r}
+readRDS(url("https://github.com/meade68/DACSS_690D_Week09_HW2/raw/refs/heads/main/hex_person.rds"))
+```

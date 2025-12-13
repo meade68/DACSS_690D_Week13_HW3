@@ -116,6 +116,6 @@ Iowa_K5
 
 ```{r}
 saveRDS(Iowa_K5,file = "Iowa_K5.rds")
-saveRDS(Block_person,file = "Iowa_SkaterR.rds")
+saveRDS(Iowa_SkaterR,file = "Iowa_SkaterR.rds")
 
 ```

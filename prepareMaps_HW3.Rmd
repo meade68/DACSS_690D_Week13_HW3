@@ -1,0 +1,325 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+rm(list = ls())
+
+Link="https://github.com/meade68/DACSS_690D_Week09_HW2/raw/refs/heads/main/somerville_crime.gpkg"
+library(sf)
+library(ggplot2)
+library(leaflet)
+st_layers(Link)
+```
+
+## Reading the layers:
+
+```{r, message=FALSE}
+census_BG_crime_BG <- st_read(Link, layer = "census_BG_crime_BG")
+areal_somerville <- st_read(Link, layer = "areal_somerville")
+apt_old <- st_read(Link, layer = "apt_old")
+somerville_bound <- st_read(Link, layer = "somerville_bound")
+
+```
+
+```         
+```
+
+# Crime BG- interactive property crimes
+
+```         
+```
+
+```{r}
+# ensure geometries are POINT and in WGS84
+apt_old <- st_transform(apt_old, 4326)
+# If apt_old isn't POINT, uncomment the next line:
+# apt_old <- st_cast(apt_old, "POINT")
+
+census_BG_crime_BG <- st_transform(census_BG_crime_BG, 4326)
+somerville_bound   <- st_transform(somerville_bound, 4326)
+
+pal <- colorFactor(
+  palette = "RdBu",
+  domain  = census_BG_crime_BG$property_c_bin,
+  ordered = TRUE,
+  reverse = FALSE
+)
+
+# center for the home button
+bb <- st_bbox(somerville_bound)
+somerville_center <- c(mean(c(bb["ymin"], bb["ymax"])),
+                       mean(c(bb["xmin"], bb["xmax"])))  # c(lat, lon)
+
+Block_property <- leaflet() %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addPolygons(
+    data = census_BG_crime_BG,
+    fillColor = ~pal(property_c_bin),
+    fillOpacity = 0.7,
+    color = "white",
+    weight = 1,
+    opacity = 1,
+    label = lapply(
+      paste("Property Crimes per Capita:",
+            round(census_BG_crime_BG$property_c_count_p_capita, 2)),
+      htmltools::HTML
+    )
+  ) %>%
+  addCircleMarkers(
+    data = apt_old,                     # sf POINT layer
+    radius = 6,
+    fillColor = "grey",
+    fillOpacity = 0.9,
+    color = "black",
+    weight = 1,
+    label = ~htmltools::htmlEscape(address)  # replace with your column name
+  ) %>%                                   # ← properly close addCircleMarkers()
+  addLegend(
+    pal = pal,
+    values = census_BG_crime_BG$property_c_bin,
+    opacity = 0.7,
+    title = "Property Crime Risk",
+    position = "bottomright"
+  ) %>%
+  addEasyButton(
+    easyButton(
+      icon = "fa-home",
+      title = "Reset to Somerville, MA",
+      onClick = JS(sprintf(
+        "function(btn, map){ map.setView([%f, %f], 12); }",
+        somerville_center[1], somerville_center[2]  # lat, lon
+      ))
+    )
+  )
+
+Block_property
+```
+
+# Crime BG- interactive person crimes
+
+```{r}
+# ensure geometries are POINT and in WGS84
+apt_old <- st_transform(apt_old, 4326)
+# If apt_old isn't POINT, uncomment the next line:
+# apt_old <- st_cast(apt_old, "POINT")
+
+census_BG_crime_BG <- st_transform(census_BG_crime_BG, 4326)
+somerville_bound   <- st_transform(somerville_bound, 4326)
+
+pal <- colorFactor(
+  palette = "RdBu",
+  domain  = census_BG_crime_BG$person_c_bin,
+  ordered = TRUE,
+  reverse = FALSE
+)
+
+# center for the home button
+bb <- st_bbox(somerville_bound)
+somerville_center <- c(mean(c(bb["ymin"], bb["ymax"])),
+                       mean(c(bb["xmin"], bb["xmax"])))  # c(lat, lon)
+
+Block_person <- leaflet() %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addPolygons(
+    data = census_BG_crime_BG,
+    fillColor = ~pal(person_c_bin),
+    fillOpacity = 0.7,
+    color = "white",
+    weight = 1,
+    opacity = 1,
+    label = lapply(
+      paste("Person Crimes per Capita:",
+            round(census_BG_crime_BG$person_c_count_p_capita, 2)),
+      htmltools::HTML
+    )
+  ) %>%
+  addCircleMarkers(
+    data = apt_old,                     # sf POINT layer
+    radius = 6,
+    fillColor = "grey",
+    fillOpacity = 0.9,
+    color = "black",
+    weight = 1,
+    label = ~htmltools::htmlEscape(address)  # replace with your column name
+  ) %>%                                   # ← properly close addCircleMarkers()
+  addLegend(
+    pal = pal,
+    values = census_BG_crime_BG$person_c_bin,
+    opacity = 0.7,
+    title = "Person Crime Risk",
+    position = "bottomright"
+  ) %>%
+  addEasyButton(
+    easyButton(
+      icon = "fa-home",
+      title = "Reset to Somerville, MA",
+      onClick = JS(sprintf(
+        "function(btn, map){ map.setView([%f, %f], 12); }",
+        somerville_center[1], somerville_center[2]  # lat, lon
+      ))
+    )
+  )
+
+Block_person
+```
+
+# Crime hex- interactive property crimes
+
+```         
+```
+
+```{r}
+# ensure geometries are POINT and in WGS84
+apt_old <- st_transform(apt_old, 4326)
+# If apt_old isn't POINT, uncomment the next line:
+# apt_old <- st_cast(apt_old, "POINT")
+
+areal_somerville <- st_transform(areal_somerville, 4326)
+somerville_bound   <- st_transform(somerville_bound, 4326)
+
+pal <- colorFactor(
+  palette = "RdBu",
+  domain  = areal_somerville$property_c_bin,
+  ordered = TRUE,
+  reverse = FALSE
+)
+
+# center for the home button
+bb <- st_bbox(somerville_bound)
+somerville_center <- c(mean(c(bb["ymin"], bb["ymax"])),
+                       mean(c(bb["xmin"], bb["xmax"])))  # c(lat, lon)
+
+hex_property <- leaflet() %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addPolygons(
+    data = areal_somerville,
+    fillColor = ~pal(property_c_bin),
+    fillOpacity = 0.7,
+    color = "white",
+    weight = 1,
+    opacity = 1,
+    label = lapply(
+      paste("Property Crimes per Capita:",
+            round(areal_somerville$property_c_count_p_capita, 2)),
+      htmltools::HTML
+    )
+  ) %>%
+  addCircleMarkers(
+    data = apt_old,                     # sf POINT layer
+    radius = 6,
+    fillColor = "grey",
+    fillOpacity = 0.9,
+    color = "black",
+    weight = 1,
+    label = ~htmltools::htmlEscape(address)  # replace with your column name
+  ) %>%                                   # ← properly close addCircleMarkers()
+  addLegend(
+    pal = pal,
+    values = areal_somerville$property_c_bin,
+    opacity = 0.7,
+    title = "Property Crime Risk",
+    position = "bottomright"
+  ) %>%
+  addEasyButton(
+    easyButton(
+      icon = "fa-home",
+      title = "Reset to Somerville, MA",
+      onClick = JS(sprintf(
+        "function(btn, map){ map.setView([%f, %f], 12); }",
+        somerville_center[1], somerville_center[2]  # lat, lon
+      ))
+    )
+  )
+
+hex_property
+```
+
+# Crime hex- interactive person crimes
+
+```         
+```
+
+```{r}
+# ensure geometries are POINT and in WGS84
+apt_old <- st_transform(apt_old, 4326)
+# If apt_old isn't POINT, uncomment the next line:
+# apt_old <- st_cast(apt_old, "POINT")
+
+areal_somerville <- st_transform(areal_somerville, 4326)
+somerville_bound   <- st_transform(somerville_bound, 4326)
+
+pal <- colorFactor(
+  palette = "RdBu",
+  domain  = areal_somerville$person_c_bin,
+  ordered = TRUE,
+  reverse = FALSE
+)
+
+# center for the home button
+bb <- st_bbox(somerville_bound)
+somerville_center <- c(mean(c(bb["ymin"], bb["ymax"])),
+                       mean(c(bb["xmin"], bb["xmax"])))  # c(lat, lon)
+
+hex_person <- leaflet() %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addPolygons(
+    data = areal_somerville,
+    fillColor = ~pal(person_c_bin),
+    fillOpacity = 0.7,
+    color = "white",
+    weight = 1,
+    opacity = 1,
+    label = lapply(
+      paste("Property Crimes per Capita:",
+            round(areal_somerville$person_c_count_p_capita, 2)),
+      htmltools::HTML
+    )
+  ) %>%
+  addCircleMarkers(
+    data = apt_old,                     # sf POINT layer
+    radius = 6,
+    fillColor = "grey",
+    fillOpacity = 0.9,
+    color = "black",
+    weight = 1,
+    label = ~htmltools::htmlEscape(address)  # replace with your column name
+  ) %>%                                   # ← properly close addCircleMarkers()
+  addLegend(
+    pal = pal,
+    values = areal_somerville$person_c_bin,
+    opacity = 0.7,
+    title = "Person Crime Risk",
+    position = "bottomright"
+  ) %>%
+  addEasyButton(
+    easyButton(
+      icon = "fa-home",
+      title = "Reset to Somerville, MA",
+      onClick = JS(sprintf(
+        "function(btn, map){ map.setView([%f, %f], 12); }",
+        somerville_center[1], somerville_center[2]  # lat, lon
+      ))
+    )
+  )
+
+hex_person
+```
+
+```{r}
+saveRDS(Block_property,file = "Block_property.rds")
+saveRDS(Block_person,file = "Block_person.rds")
+saveRDS(hex_property,file = "hex_property.rds")
+saveRDS(hex_person,file = "hex_person.rds")
+
+
+
+
+
+
+
+
+```
